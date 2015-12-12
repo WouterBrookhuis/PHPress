@@ -7,8 +7,10 @@ and open the template in the editor.
 <?php
 include_once 'phpress/phpress.php';
 
+$displayMode = 0;   //0 is nothing ('index' for now), 1 is a php included page, 2 is a db page
 $pageBody = "<h1>Index</h1>";
 $pageTitle = "Index";
+$pageData = null;
 
 $page = filter_input(INPUT_GET, "page");
 $pageId = filter_input(INPUT_GET, "pageId");
@@ -20,7 +22,8 @@ if($page)
         default: break;
     }
     $pageTitle = $page;
-    $pageBody = get_include_contents($page . ".php");
+    $pageBody = get_include_contents("pages/" . $page . ".php");
+    $displayMode = 1;
 }
 else if($pageId && filter_var($pageId, FILTER_VALIDATE_INT))
 {
@@ -30,6 +33,7 @@ else if($pageId && filter_var($pageId, FILTER_VALIDATE_INT))
     {
         $pageTitle = $pageData['pageName'];
         $pageBody = $pageData['content'];
+        $displayMode = 2;
     }
 }
 ?>
@@ -42,12 +46,48 @@ else if($pageId && filter_var($pageId, FILTER_VALIDATE_INT))
     <body>
         <div id="container">
             <div id="header">
-                <h1>Site title</h1>
+                <h1 id="header_title">Site title</h1>
+                <?php 
+                if(isset($_SESSION['user']['userId']))
+                {
+                    //From right to left (I blame float)
+                    echo '<p><a href="?page=logout"><img class="header_icon" src="phpress/images/icon-exit.png" alt="icon"></a></p>';
+                    echo '<p><a href="?page=admin"><img class="header_icon" src="phpress/images/icon-cp.png" alt="icon"></a></p>';
+                    if($displayMode === 2 && pp_can_edit_page($pageData['pageId'], $_SESSION['user']['userId']))
+                    {
+                        echo '<p><a href="?page=editpage&param=' . $pageId . '"><img class="header_icon" src="phpress/images/icon-edit-page.png" alt="icon"></a></p>';
+                    }
+                    
+                    //Debug info
+                    echo '<p>' . $_SESSION['user']['userType'] . ' ' . $_SESSION['user']['userName'] . ' with userId ' . $_SESSION['user']['userId'] . ' is logged in</p>';
+                }
+                else
+                {
+                    echo '<p><a href="?page=login"><img class="header_icon" src="phpress/images/icon-login.png" alt="icon"></a></p>';
+                }
+                ?>
             </div>
             <div id="menu">
                 <ul>
-                    <li><a href="#">Link</a></li>
-                    <li><a href="#">Link</a></li>
+                    <?php
+                    if($displayMode === 2)
+                        $pages = pp_get_menu(pp_get_user_details($pageData['authorId'])['activeMenu']);
+                    else
+                        $pages = isset($_SESSION['user']['userId']) ? pp_get_menu(pp_get_user_details($_SESSION['user']['userId'])['activeMenu']) : null;
+                    if($pages)
+                    {
+                        foreach($pages as $index => $userPage)
+                        {
+                            if($index === 0)
+                                continue;
+
+                            if($displayMode === 2 && $userPage['pageId'] === $pageId)
+                                echo '<li><a class="menubar_a_selected" href="?pageId=' . $userPage['pageId'] . '">' . pp_get_page($userPage['pageId'])['pageName'] . '</a></li>';
+                            else
+                                echo '<li><a class="menubar_a" href="?pageId=' . $userPage['pageId'] . '">' . pp_get_page($userPage['pageId'])['pageName'] . '</a></li>';
+                        }
+                    }
+                    ?>
                 </ul>
             </div>
             <div id="content">
@@ -55,7 +95,17 @@ else if($pageId && filter_var($pageId, FILTER_VALIDATE_INT))
                     echo $pageBody;
                 ?>
             </div>
-            <div id="footer"></div>
+            <div id="footer">
+                <pre>
+                    <?php
+                    $_dvtc = pp_get_connected_thread_count()['Value'];
+                    if($_dvtc > 1)
+                    {
+                        pp_write_log("WARNING: Connections greater than 1: " . $_dvtc);
+                    }
+                    ?>
+                </pre>                
+            </div>
         </div>
     </body>
 </html>

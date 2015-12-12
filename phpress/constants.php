@@ -10,3 +10,5 @@ define("PP_DATABASE", "phpress");
 //Single noun table names!
 define("PP_TABLE_USER", "user");
 define("PP_TABLE_PAGE", "page");
+define("PP_TABLE_MENU", "menu");
+define("PP_TABLE_MENU_ITEM", "menu_item");
