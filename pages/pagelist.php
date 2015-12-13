@@ -1,6 +1,7 @@
 <?php
 if(isset($_SESSION['user']['userId']))
 {
+    echo '<p><a href="?page=admin">Back to admin panel</a></p>';
     echo '<h2>Your pages</h2>';
     if(isset($_POST['submit']))
     {
@@ -16,20 +17,25 @@ if(isset($_SESSION['user']['userId']))
         }
     }
     $pageData = pp_get_user_pages($_SESSION['user']['userId']);
-?>
-<table>
-    <tr><th rel="col" class="align_left">page name</th><th rel="col">page id</th><th rel="col">delete page</th></tr>
-    <?php
-    foreach($pageData as $data)
-    {            
-        echo "<tr>\n";
-        echo '<td class="align_left"><a href="?pageId=' . $data['pageId'] . '">' . $data['pageName'] . '</a></td>';
-        echo '<td>' . $data['pageId'] . '</td>';
-        echo '<td><a href="?page=shredpage&param=' . $data['pageId'] . '">delete</a></td>';
-        echo "</tr>\n";
+    if($pageData)
+    {
+        echo '<table>';
+        echo '<tr><th rel="col" class="align_left">Page name</th><th rel="col">Page id</th><th rel="col">Delete page</th></tr>';
+        foreach($pageData as $data)
+        {            
+            echo "<tr>\n";
+            echo '<td class="align_left"><a href="?page=editpage&param=' . $data['pageId'] . '">' . $data['pageName'] . '</a></td>';
+            echo '<td>' . $data['pageId'] . '</td>';
+            echo '<td><a href="?page=shredpage&param=' . $data['pageId'] . '">delete</a></td>';
+            echo "</tr>\n";
+        }
+        echo '</table>';
+    }
+    else 
+    {
+        echo "<p>You don't seem to have any pages</p>";
     }
     ?>
-</table>
 <hr>
 <h2>Create new page</h2>
 <form action="<?php echo $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING']; ?>" method="post">

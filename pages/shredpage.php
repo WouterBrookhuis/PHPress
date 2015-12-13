@@ -4,6 +4,7 @@ if(isset($_SESSION['user']) && isset($_GET['param']))
     $pageId = filter_input(INPUT_GET, 'param', FILTER_VALIDATE_INT);
     if($pageId && pp_can_edit_page($pageId, $_SESSION['user']['userId']))
     {
+        echo '<p><a href="?page=pagelist">Back to page list</a></p>';
         if(pp_delete_page($pageId))
             echo '<h2>Page was removed</h2>';
         else

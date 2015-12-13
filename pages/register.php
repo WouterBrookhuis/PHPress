@@ -10,6 +10,13 @@
             if(pp_register($userName, $userPass, $userMail))
             {
                 echo "<p>You were registered!</p>";
+                //Login right now
+                $userData = pp_login($userName, $userPass);
+                if($userData)
+                {
+                    $_SESSION['user'] = $userData;
+                    echo "<p>You were logged in</p>";
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 <?php
 if(isset($_SESSION['user']['userId']))
 {
+    echo '<p><a href="?page=admin">Back to admin panel</a></p>';
     echo '<h2>Select active menu</h2>';
     if(isset($_POST['submit']))
     {
@@ -37,7 +38,7 @@ if(isset($_SESSION['user']['userId']))
 <h2>Create new menu</h2>
 <form action="<?php echo $_SERVER['PHP_SELF'] . "?page=createmenu"; ?>" method="post">
     <p>Menu name<br><input type="text" name="name" value="New Menu"></p>
-    <p><input type="submit" name="submit" value="Create page"></p>
+    <p><input type="submit" name="submit" value="Create menu"></p>
 </form>
 <?php
 }

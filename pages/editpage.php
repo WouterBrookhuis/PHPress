@@ -1,8 +1,10 @@
 <?php
 if(isset($_SESSION['user']['userId']) && isset($_GET['param']))
 {
-    echo '<h2>Edit a page</h2>';
     $pageId = filter_input(INPUT_GET, 'param', FILTER_VALIDATE_INT);
+    echo '<p><a href="?page=pagelist">Back to page list</a></p>';
+    echo '<p><a href="?pageId=' . $pageId. '">View page</a></p>';
+    echo '<h2>Edit a page</h2>';
     if($pageId && pp_can_edit_page($pageId, $_SESSION['user']['userId']))
     {
         if(isset($_POST['submit']))

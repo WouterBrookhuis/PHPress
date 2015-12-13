@@ -75,8 +75,6 @@ function pp_register($userName, $userPass, $userMail)
             echo "<p>This username or email is already registered!</p>";
             return false;
         }
-        
-        //TODO: CREATE FIRST PAGE AND MENU WHEN REGESTERING!
                 
         $sql = "INSERT INTO " . PP_TABLE_USER . " VALUES(" . "NULL" . ", "
                 . "'" . mysqli_real_escape_string($link, $userName) . "', "
@@ -88,6 +86,12 @@ function pp_register($userName, $userPass, $userMail)
         $result = mysqli_query($link, $sql);
         if($result)
         {
+            $newUserId = mysqli_insert_id($link);
+            //Create menu and page;
+            $newPageId = pp_create_page($newUserId, "My First Page", "<h2>Page by " . $userName . "</h2>");
+            $newMenuId = pp_create_menu($newUserId, "My Menu");
+            pp_create_menu_item($newMenuId, $newPageId);
+            pp_set_active_menu($newUserId, $newMenuId);
             return true;
         }
         else
@@ -108,7 +112,10 @@ function pp_get_user_details_name($userName)
         $result = mysqli_query($link, $sql);
         if(($user = mysqli_fetch_assoc($result)) !== null) 
         {
-            return $user;
+            $temp = $user;
+            $temp['userPass'] = null;
+            $temp['userToken'] = null;
+            return $temp;
         }
     }
     return false;
@@ -123,8 +130,28 @@ function pp_get_user_details($userId)
         $result = mysqli_query($link, $sql);
         if(($user = mysqli_fetch_assoc($result)) !== null) 
         {
-            return $user;
+            $temp = $user;
+            $temp['userPass'] = null;
+            $temp['userToken'] = null;
+            return $temp;
         }
+    }
+    return false;
+}
+
+function pp_get_users()
+{
+    $link = pp_connect();
+    if($link)
+    {
+        $users = array();
+        $sql = "SELECT userId, userName, userType FROM " . PP_TABLE_USER;
+        $result = mysqli_query($link, $sql);
+        while(($user = mysqli_fetch_assoc($result)) !== null) 
+        {
+            array_push($users, $user);
+        }
+        return $users;
     }
     return false;
 }
@@ -154,6 +181,7 @@ function pp_login($userName, $userPass)
 /*
  * menu(menuId, userId, menuName);
  * menu_item(menuId, pageId);
+ * +user(activeMenu(menuId));
  */
 function pp_create_menu($userId, $menuName='New Menu')
 {
