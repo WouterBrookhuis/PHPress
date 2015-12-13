@@ -75,13 +75,16 @@ function pp_register($userName, $userPass, $userMail)
             echo "<p>This username or email is already registered!</p>";
             return false;
         }
+        
+        //TODO: CREATE FIRST PAGE AND MENU WHEN REGESTERING!
                 
         $sql = "INSERT INTO " . PP_TABLE_USER . " VALUES(" . "NULL" . ", "
                 . "'" . mysqli_real_escape_string($link, $userName) . "', "
                 . "'" . mysqli_real_escape_string($link, password_hash($userPass, PASSWORD_DEFAULT)) . "', "
                 . "'" . "user" . "', "
                 . "'" . mysqli_real_escape_string($link, $userMail) . "', "
-                . "'" . mysqli_real_escape_string($link, pp_generate_user_token()) . "')";
+                . "'" . mysqli_real_escape_string($link, pp_generate_user_token()) . "', "
+                . "0)";
         $result = mysqli_query($link, $sql);
         if($result)
         {
@@ -91,6 +94,21 @@ function pp_register($userName, $userPass, $userMail)
         {
             echo "<p>An error occured registering a new user</p>";
             echo "<p>" . mysqli_error($link) . "</p>";
+        }
+    }
+    return false;
+}
+
+function pp_get_user_details_name($userName)
+{
+    $link = pp_connect();
+    if($link)
+    {
+        $sql = "SELECT * FROM " . PP_TABLE_USER . " WHERE userName='" . mysqli_real_escape_string($link, $userName) . "'";
+        $result = mysqli_query($link, $sql);
+        if(($user = mysqli_fetch_assoc($result)) !== null) 
+        {
+            return $user;
         }
     }
     return false;

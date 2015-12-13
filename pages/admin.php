@@ -13,6 +13,19 @@
             <img class="admin_panel_button_img" src="phpress/images/icon-edit-page.png" alt="icon">
         </div>
     </a>
+    <?php
+    if($_SESSION['user']['userType'] === 'admin')
+    {
+        ?>
+    <a href="?page=userlist">
+        <div class="admin_panel_button">
+            <h3>Users</h3>
+            <img class="admin_panel_button_img" src="phpress/images/icon-edit-page.png" alt="icon">
+        </div>
+    </a>
+    <?php
+    }
+    ?>
     <a href="?page=logout">
         <div class="admin_panel_button">
             <h3>Logout</h3>

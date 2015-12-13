@@ -14,6 +14,8 @@ $pageData = null;
 
 $page = filter_input(INPUT_GET, "page");
 $pageId = filter_input(INPUT_GET, "pageId");
+$userGet = filter_input(INPUT_GET, "user"); //name
+
 if($page)
 {
     switch($page)
@@ -34,6 +36,29 @@ else if($pageId && filter_var($pageId, FILTER_VALIDATE_INT))
         $pageTitle = $pageData['pageName'];
         $pageBody = $pageData['content'];
         $displayMode = 2;
+    }
+}
+else if($userGet)
+{
+    $uid = pp_get_user_details_name($userGet)['activeMenu'];
+    if($uid)
+    {
+        $p =  pp_get_menu($uid);
+        if($p)
+        {
+            if(count($p) > 1)
+            {
+                $pageId = $p[1]['pageId'];
+                //Go to that page
+                $pageData = pp_get_page($pageId);
+                if($pageData)
+                {
+                    $pageTitle = $pageData['pageName'];
+                    $pageBody = $pageData['content'];
+                    $displayMode = 2;
+                }
+            }
+        }
     }
 }
 ?>
@@ -103,6 +128,8 @@ else if($pageId && filter_var($pageId, FILTER_VALIDATE_INT))
                     {
                         pp_write_log("WARNING: Connections greater than 1: " . $_dvtc);
                     }
+                    //Trust me, this makes sense
+                    mysqli_close(pp_connect());
                     ?>
                 </pre>                
             </div>
